@@ -84,4 +84,26 @@ Popular choices include:
 -   [GitHub Pages](https://pages.github.com)
 -   [Firebase Hosting](https://firebase.google.com/docs/hosting)
 
-Simply connect your GitHub repository to one of these services and configure it to build and deploy your application. Remember to set up your `API_KEY` as an environment variable in your hosting provider's settings.
+Simply connect your GitHub repository to one of these services and configure it to build and deploy your application. **Crucially, you must set up your `API_KEY` as an environment variable in your hosting provider's settings.**
+
+## 🔍 Troubleshooting
+
+### Help! I deployed my app, but all I see is a blank page.
+
+This is a common issue. Here are the steps to debug it:
+
+1.  **Check the API Key**: The most common cause is a missing API key.
+    -   This application will show an error screen if the API key is not configured.
+    -   Go to your hosting provider's dashboard (Vercel, Netlify, etc.).
+    -   Find the "Environment Variables" section for your project.
+    -   Ensure you have a variable named `VITE_API_KEY` (or the equivalent for your build tool) set to your correct Google Gemini API Key.
+    -   You may need to trigger a new deployment for the change to take effect.
+
+2.  **Check the Browser Console**: Your browser's developer tools are your best friend.
+    -   Right-click on the blank page and select "Inspect".
+    -   Go to the "Console" tab.
+    -   Look for any errors in red. These messages will often tell you exactly what's wrong (e.g., "API_KEY is not defined," "Failed to load resource," etc.).
+
+3.  **Verify Build Settings**:
+    -   Ensure your hosting provider is running the correct build command (e.g., `npm run build`).
+    -   Make sure the "Publish directory" or "Output directory" is set correctly (usually `dist` or `build`).

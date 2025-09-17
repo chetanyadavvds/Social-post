@@ -1,12 +1,22 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { FormState, GeneratedPosts, Platform } from '../types';
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable is not set.");
-}
+export const isApiKeyConfigured = (): boolean => {
+  return !!process.env.API_KEY;
+};
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the AI client only when needed and if the key exists.
+// This prevents a hard crash when the app loads without a key.
+let ai: GoogleGenAI | null = null;
+const getAiClient = (): GoogleGenAI => {
+    if (!process.env.API_KEY) {
+      throw new Error("API_KEY environment variable not configured. Please set it in your hosting provider's settings.");
+    }
+    if (!ai) {
+        ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    }
+    return ai;
+}
 
 function buildPrompt(formState: FormState): string {
   const enabledPlatforms = Object.entries(formState.platforms)
@@ -57,10 +67,11 @@ function buildSchema(formState: FormState): { [key: string]: any } {
 
 
 export const generateSocialMediaPosts = async (formState: FormState): Promise<GeneratedPosts> => {
+  const client = getAiClient();
   const prompt = buildPrompt(formState);
   const schema = buildSchema(formState);
 
-  const result = await ai.models.generateContent({
+  const result = await client.models.generateContent({
     model: 'gemini-2.5-flash',
     contents: prompt,
     config: {

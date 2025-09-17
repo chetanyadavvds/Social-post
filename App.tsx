@@ -2,15 +2,38 @@ import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { InputForm } from './components/InputForm';
 import { GeneratedPostsDisplay } from './components/GeneratedPostsDisplay';
-import { generateSocialMediaPosts } from './services/geminiService';
+import { generateSocialMediaPosts, isApiKeyConfigured } from './services/geminiService';
 import { FormState, GeneratedPosts } from './types';
 import { Modal } from './components/Modal';
+
+const ApiKeyErrorDisplay: React.FC = () => (
+    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans flex items-center justify-center p-4">
+        <div className="bg-red-900/50 border border-red-700 text-red-300 px-6 py-8 rounded-lg text-center max-w-2xl">
+            <h1 className="text-2xl font-bold mb-4">Configuration Error</h1>
+            <p className="text-lg mb-2">The Google Gemini API Key is missing.</p>
+            <p className="text-slate-300">
+                To get the application running, you need to set your API key as an environment variable in your hosting provider's settings.
+            </p>
+            <p className="mt-4 text-sm bg-slate-800 p-3 rounded font-mono">
+                Example: <code>VITE_API_KEY=YOUR_API_KEY_HERE</code>
+            </p>
+            <p className="mt-4 text-slate-400">
+                Please refer to the <code>README.md</code> file and your hosting provider's documentation for more details on setting up environment variables. After setting the key, you may need to redeploy your application.
+            </p>
+        </div>
+    </div>
+);
+
 
 const App: React.FC = () => {
   const [generatedPosts, setGeneratedPosts] = useState<GeneratedPosts | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeployModalOpen, setIsDeployModalOpen] = useState<boolean>(false);
+  
+  if (!isApiKeyConfigured()) {
+    return <ApiKeyErrorDisplay />;
+  }
 
   const handleGenerate = useCallback(async (formState: FormState) => {
     setIsLoading(true);

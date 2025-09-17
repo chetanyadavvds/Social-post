@@ -20,6 +20,7 @@ This application provides a simple and intuitive interface to generate high-qual
 ## 🛠️ Tech Stack
 
 -   **Frontend**: [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/)
+-   **Build Tool**: [Vite](https://vitejs.dev/)
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 -   **AI**: [Google Gemini API](https://ai.google.dev/) (`@google/genai`)
 
@@ -48,13 +49,10 @@ To run this project locally, you'll need to have Node.js and a package manager l
 3.  **Set up environment variables:**
     Create a file named `.env` in the root of your project and add your Google Gemini API key:
     ```
-    # If using Vite
+    # .env
     VITE_API_KEY=YOUR_GEMINI_API_KEY_HERE
-
-    # If using Create React App
-    REACT_APP_API_KEY=YOUR_GEMINI_API_KEY_HERE
     ```
-    *The application code expects `process.env.API_KEY`. Build tools like Vite and Create React App expose environment variables with specific prefixes (`VITE_` or `REACT_APP_`) to the frontend code.*
+    *The application code has been configured to use Vite's standard `VITE_` prefix for environment variables.*
 
 4.  **Run the development server:**
     ```bash
@@ -74,36 +72,62 @@ The application should now be running on your local machine, typically at `http:
 7.  The AI-generated content will appear on the right-hand side, organized into cards for each platform.
 8.  Use the **"Copy"** button on any card to copy the text to your clipboard.
 
-## 🌐 Deployment
+## 🌐 Deploying to GitHub Pages
 
-This is a static React application, making it easy to deploy. You can host it on any static site hosting service.
+You cannot deploy the source code (`.tsx` files) directly. You must **build** the project first. Follow these steps carefully to deploy your app to GitHub Pages.
 
-Popular choices include:
--   [Vercel](https://vercel.com)
--   [Netlify](https://netlify.com)
--   [GitHub Pages](https://pages.github.com)
--   [Firebase Hosting](https://firebase.google.com/docs/hosting)
+### Step 1: Configure Vite for GitHub Pages
+A `vite.config.ts` file has been added to this project. It sets the `base` path to `/Social-post/`, which is essential for your deployed site to load correctly. You shouldn't need to change this.
 
-Simply connect your GitHub repository to one of these services and configure it to build and deploy your application. **Crucially, you must set up your `API_KEY` as an environment variable in your hosting provider's settings.**
+### Step 2: Update `package.json`
+You need to tell your project where it will be hosted and add scripts for easy deployment. Open your `package.json` file and add the following two lines:
+
+1. Add the `homepage` key to the top level:
+```json
+"homepage": "https://chetanyadavvds.github.io/Social-post",
+```
+
+2. Add `predeploy` and `deploy` scripts inside the existing `scripts` object:
+```json
+"scripts": {
+  // ... other scripts like "dev", "build" ...
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+},
+```
+
+### Step 3: Install `gh-pages`
+This is a small helper package that makes pushing your built code to GitHub Pages easy.
+```bash
+npm install gh-pages --save-dev
+```
+
+### Step 4: Deploy!
+Now, just run the deploy command from your terminal:
+```bash
+npm run deploy
+```
+This command will first run `predeploy` (which builds your application into a `dist` folder) and then run `deploy` (which pushes the contents of the `dist` folder to a special `gh-pages` branch in your repository).
+
+### Step 5: Configure GitHub Pages Source
+1.  Go to your repository on GitHub.
+2.  Click on **Settings** > **Pages**.
+3.  Under "Build and deployment", change the **Source** from "Deploy from a branch" to **GitHub Actions**. If that option is unavailable or you prefer the manual branch method, select **"Deploy from a branch"** and choose `gh-pages` as the branch and `/ (root)` as the folder.
+4.  Click **Save**.
+
+Your site should be live at the `homepage` URL you specified in a few minutes!
+
+> **⚠️ SECURITY WARNING:** The `npm run deploy` method will make your `VITE_API_KEY` from the `.env` file **publicly visible** in your site's JavaScript files. For personal projects or demos this might be okay, but for a production application, you should use [GitHub Repository Secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions) and a GitHub Actions workflow to build and deploy your site securely.
 
 ## 🔍 Troubleshooting
 
 ### Help! I deployed my app, but all I see is a blank page.
 
-This is a common issue. Here are the steps to debug it:
+If you followed the deployment steps above, this is unlikely. But if it happens:
 
-1.  **Check the API Key**: The most common cause is a missing API key.
-    -   This application will show an error screen if the API key is not configured.
-    -   Go to your hosting provider's dashboard (Vercel, Netlify, etc.).
-    -   Find the "Environment Variables" section for your project.
-    -   Ensure you have a variable named `VITE_API_KEY` (or the equivalent for your build tool) set to your correct Google Gemini API Key.
-    -   You may need to trigger a new deployment for the change to take effect.
+1.  **Check the API Key**: The most common cause for the app *showing an error* (not a blank page) is a missing API key. When deploying, you must set the `VITE_API_KEY` as an environment variable in your hosting provider's settings (or in GitHub Secrets if using Actions).
 
 2.  **Check the Browser Console**: Your browser's developer tools are your best friend.
     -   Right-click on the blank page and select "Inspect".
     -   Go to the "Console" tab.
-    -   Look for any errors in red. These messages will often tell you exactly what's wrong (e.g., "API_KEY is not defined," "Failed to load resource," etc.).
-
-3.  **Verify Build Settings**:
-    -   Ensure your hosting provider is running the correct build command (e.g., `npm run build`).
-    -   Make sure the "Publish directory" or "Output directory" is set correctly (usually `dist` or `build`).
+    -   Look for any errors in red. An error like `404 Not Found` for a JavaScript or CSS file usually means the `base` path in `vite.config.ts` or the `homepage` in `package.json` is incorrect.

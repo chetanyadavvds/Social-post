@@ -2,6 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { FormState, GeneratedPosts, Platform } from '../types';
 
 export const isApiKeyConfigured = (): boolean => {
+  // Fix: Use process.env.API_KEY as per the coding guidelines.
   return !!process.env.API_KEY;
 };
 
@@ -9,10 +10,13 @@ export const isApiKeyConfigured = (): boolean => {
 // This prevents a hard crash when the app loads without a key.
 let ai: GoogleGenAI | null = null;
 const getAiClient = (): GoogleGenAI => {
+    // Fix: Use process.env.API_KEY as per the coding guidelines.
     if (!process.env.API_KEY) {
-      throw new Error("API_KEY environment variable not configured. Please set it in your hosting provider's settings.");
+      // Fix: Update error message to reflect the correct environment variable name.
+      throw new Error("API_KEY environment variable not configured. Please set it in your hosting provider's settings or a local .env file.");
     }
     if (!ai) {
+        // Fix: Initialize the client with process.env.API_KEY directly as per the coding guidelines.
         ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     }
     return ai;

@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { InputForm } from './components/InputForm';
@@ -14,8 +15,9 @@ const ApiKeyErrorDisplay: React.FC = () => (
             <p className="text-slate-300">
                 To get the application running, you need to set your API key as an environment variable in your hosting provider's settings.
             </p>
+            {/* Fix: Updated environment variable name to API_KEY as per guidelines. */}
             <p className="mt-4 text-sm bg-slate-800 p-3 rounded font-mono">
-                Example: <code>VITE_API_KEY=YOUR_API_KEY_HERE</code>
+                Example: <code>API_KEY=YOUR_API_KEY_HERE</code>
             </p>
             <p className="mt-4 text-slate-400">
                 Please refer to the <code>README.md</code> file and your hosting provider's documentation for more details on setting up environment variables. After setting the key, you may need to redeploy your application.
